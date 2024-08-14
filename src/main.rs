@@ -1,5 +1,7 @@
-use actix_web::{App, HttpServer};
 mod handler;
+mod model;
+mod service;
+use actix_web::{App, HttpServer};
 use handler::hello_handler::hello;
 
 #[actix_web::main]

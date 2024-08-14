@@ -1,3 +1,4 @@
+use crate::service::hello_service;
 use actix_web::{get, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 
@@ -10,6 +11,6 @@ struct HelloMsg {
 #[get("/api/hello")]
 pub async fn hello() -> impl Responder {
     HttpResponse::Ok().json(HelloMsg {
-        msg: str::to_string("Hello, world!"),
+        msg: hello_service::get_hello().msg,
     })
 }
