@@ -21,49 +21,39 @@ struct ErrorMsg {
 }
 
 #[get("/api/hello/{id}")]
-pub async fn get_hello(
-    data: web::Data<mysql::Pool>,
-    path: web::Path<u64>,
-) -> impl Responder {
+pub async fn get_hello(data: web::Data<mysql::Pool>, path: web::Path<u64>) -> impl Responder {
     let id = path.into_inner();
     let hello = hello_service::get_hello(&data, id);
     match hello {
         Ok(hello) => match hello {
-            Some(hello) => HttpResponse::Ok().json(
-                HelloMsg {
-                    message: hello.message,
-                },
-            ),
-            None => HttpResponse::NotFound().json(
-                ErrorMsg {
-                    message: "Data not found".to_string(),
-                },
-            ),
+            Some(hello) => HttpResponse::Ok().json(HelloMsg {
+                message: hello.message,
+            }),
+            None => HttpResponse::NotFound().json(ErrorMsg {
+                message: "Data not found".to_string(),
+            }),
         },
-        Err(_) => HttpResponse::InternalServerError().json(
-            ErrorMsg {
-                message: "Failed to get data".to_string(),
-            },
-        ),
+        Err(_) => HttpResponse::InternalServerError().json(ErrorMsg {
+            message: "Failed to get data".to_string(),
+        }),
     }
 }
 
+#[derive(Deserialize)]
+struct PostHelloRequest {
+    message: String,
+}
 
 #[post("/api/hello")]
 pub async fn post_hello(
     data: web::Data<mysql::Pool>,
+    post_hello_request: web::Json<PostHelloRequest>,
 ) -> impl Responder {
-    let result = hello_service::create_hello(&data, "Hello, World!".to_string());
+    let result = hello_service::create_hello(&data, &(post_hello_request.message));
     match result {
-        Ok(id) => HttpResponse::Created().json(
-            CreateHelloMsg {
-                id: id,
-            },
-        ),
-        Err(_) => HttpResponse::InternalServerError().json(
-            ErrorMsg {
-                message: "Failed to insert data".to_string(),
-            },
-        ),
+        Ok(id) => HttpResponse::Created().json(CreateHelloMsg { id: id }),
+        Err(_) => HttpResponse::InternalServerError().json(ErrorMsg {
+            message: "Failed to insert data".to_string(),
+        }),
     }
 }
