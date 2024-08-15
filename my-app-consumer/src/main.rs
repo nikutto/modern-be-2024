@@ -1,11 +1,13 @@
 mod handler;
 mod model;
 use model::hello_message::HelloMessage;
+use opensearch::http::transport::Transport;
+use opensearch::OpenSearch;
 use rdkafka::client::ClientContext;
 use rdkafka::config::{ClientConfig, RDKafkaLogLevel};
 use rdkafka::consumer::stream_consumer::StreamConsumer;
 use rdkafka::consumer::{CommitMode, Consumer, ConsumerContext};
-use rdkafka::message::{Headers, Message};
+use rdkafka::message::Message;
 use rdkafka::util::get_rdkafka_version;
 
 struct CustomContext;
@@ -16,7 +18,7 @@ impl ConsumerContext for CustomContext {}
 
 type LoggingConsumer = StreamConsumer<CustomContext>;
 
-async fn consume_and_print(brokers: &str, group_id: &str, topics: &[&str]) {
+async fn consume_and_print(client: OpenSearch, brokers: &str, group_id: &str, topics: &[&str]) {
     let context = CustomContext;
 
     let consumer: LoggingConsumer = ClientConfig::new()
@@ -41,10 +43,16 @@ async fn consume_and_print(brokers: &str, group_id: &str, topics: &[&str]) {
                 match m.payload_view::<str>() {
                     None => (),
                     Some(Ok(s)) => {
-                        println!("{:?}", &s);
                         let message: HelloMessage = serde_json::from_str(s).unwrap();
-                        println!("{:?}", &message);
-                        handler::hello_handler::handle(message);
+                        let result = handler::hello_handler::handle(&client, message).await;
+                        match result {
+                            Ok(_) => {
+                                println!("Message processed.")
+                            }
+                            Err(e) => {
+                                println!("Error while processing message: {:?}", e)
+                            }
+                        }
                     }
                     Some(Err(e)) => {
                         println!("Error while deserializing message payload: {:?}", e);
@@ -64,5 +72,8 @@ async fn main() {
     let brokers = "127.0.0.1:9092";
     let group_id = "my-app-consumer-group-id";
 
-    consume_and_print(brokers, group_id, &topics).await
+    let transport = Transport::single_node("http://127.0.0.1:9200").unwrap();
+    let client = OpenSearch::new(transport);
+
+    consume_and_print(client, brokers, group_id, &topics).await
 }
