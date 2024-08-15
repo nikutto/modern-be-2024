@@ -2,35 +2,14 @@ mod handler;
 mod model;
 mod service;
 mod repository;
+mod configuration;
 use actix_web::{web, App, HttpServer};
+use configuration::mysql_configuration::get_mysql_pool;
 use handler::hello_handler::{get_hello, post_hello};
-
-fn get_conn_builder(
-    db_user: String,
-    db_password: String,
-    db_host: String,
-    db_port: u16,
-    db_name: String,
-) -> mysql::OptsBuilder {
-    mysql::OptsBuilder::new()
-        .ip_or_hostname(Some(db_host))
-        .tcp_port(db_port)
-        .db_name(Some(db_name))
-        .user(Some(db_user))
-        .pass(Some(db_password))
-}
-
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let builder = get_conn_builder(
-        str::to_string("user"), 
-        str::to_string("password"),
-        str::to_string("127.0.0.1"), 
-        3306,
-        str::to_string("mydb"),
-    );
-    let pool = mysql::Pool::new(builder).unwrap();
+    let pool = get_mysql_pool();
     let shared_data = web::Data::new(pool);
     HttpServer::new(move || 
         App::new()
