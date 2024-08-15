@@ -1,0 +1,13 @@
+[package]
+name = "my-app-consumer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+my-app-domain = { path = "../my-app-domain" }
+futures = "0.1"
+clap    = "2.33.0"
+tokio = { version = "1.18", features = ["full"] }
+
+    [dependencies.rdkafka]
+    version     = "0.36.2"

@@ -1,5 +1,6 @@
 [workspace]
 members = [
   "my-app-api",
+  "my-app-consumer",
   "my-app-domain",
 ]

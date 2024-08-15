@@ -11,6 +11,6 @@ To learn modern BE.
 ## Getting started
 
 1. Install rustup
-2. `set -a; source ./script/local.env; set +a;`
+2. `set -a; source ./scripts/local.env; set +a;`
   - Set all local environment variable
 3. `cargo run`

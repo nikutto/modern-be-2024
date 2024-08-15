@@ -1,8 +1,6 @@
 use my_app_domain::model::hello::Hello;
 
-use crate::{
-    repository::hello_repository::{insert_hello, select_hello},
-};
+use crate::repository::hello_repository::{insert_hello, select_hello};
 
 pub fn get_hello(pool: &mysql::Pool, id: u64) -> Result<Option<Hello>, mysql::error::Error> {
     let hello = select_hello(pool, id)?;
