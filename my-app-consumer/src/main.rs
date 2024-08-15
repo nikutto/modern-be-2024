@@ -1,3 +1,6 @@
+mod handler;
+mod model;
+use model::hello_message::HelloMessage;
 use rdkafka::client::ClientContext;
 use rdkafka::config::{ClientConfig, RDKafkaLogLevel};
 use rdkafka::consumer::stream_consumer::StreamConsumer;
@@ -35,21 +38,18 @@ async fn consume_and_print(brokers: &str, group_id: &str, topics: &[&str]) {
         match consumer.recv().await {
             Err(e) => println!("Kafka error: {}", e),
             Ok(m) => {
-                let payload = match m.payload_view::<str>() {
-                    None => "",
-                    Some(Ok(s)) => s,
+                match m.payload_view::<str>() {
+                    None => (),
+                    Some(Ok(s)) => {
+                        println!("{:?}", &s);
+                        let message: HelloMessage = serde_json::from_str(s).unwrap();
+                        println!("{:?}", &message);
+                        handler::hello_handler::handle(message);
+                    }
                     Some(Err(e)) => {
                         println!("Error while deserializing message payload: {:?}", e);
-                        ""
                     }
                 };
-                println!("key: '{:?}', payload: '{}', topic: {}, partition: {}, offset: {}, timestamp: {:?}",
-                      m.key(), payload, m.topic(), m.partition(), m.offset(), m.timestamp());
-                if let Some(headers) = m.headers() {
-                    for header in headers.iter() {
-                        println!("  Header {:#?}: {:?}", header.key, header.value);
-                    }
-                }
                 consumer.commit_message(&m, CommitMode::Async).unwrap();
             }
         };
