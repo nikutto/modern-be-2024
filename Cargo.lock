@@ -1239,9 +1239,14 @@ name = "my-app-api"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "my-app-domain",
  "mysql",
  "serde",
 ]
+
+[[package]]
+name = "my-app-domain"
+version = "0.1.0"
 
 [[package]]
 name = "mysql"

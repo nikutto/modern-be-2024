@@ -1,6 +1,6 @@
+use my_app_domain::model::hello::Hello;
 use mysql::{params, prelude::*};
 
-use crate::model::hello::Hello;
 
 pub fn insert_hello(pool: &mysql::Pool, message: &String) -> mysql::error::Result<u64> {
     let mut conn = pool.get_conn()?;

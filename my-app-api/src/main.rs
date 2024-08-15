@@ -1,6 +1,5 @@
 mod configuration;
 mod handler;
-mod model;
 mod repository;
 mod service;
 use actix_web::{web, App, HttpServer};

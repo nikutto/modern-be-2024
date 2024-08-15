@@ -1,5 +1,6 @@
+use my_app_domain::model::hello::Hello;
+
 use crate::{
-    model::hello::Hello,
     repository::hello_repository::{insert_hello, select_hello},
 };
 
