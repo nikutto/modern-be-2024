@@ -1425,8 +1425,10 @@ name = "my-app-api"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "anyhow",
  "my-app-domain",
  "mysql",
+ "opensearch",
  "serde",
 ]
 

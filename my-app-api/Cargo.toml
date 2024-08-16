@@ -8,3 +8,5 @@ actix-web = "4"
 serde = { version = "1", features = ["derive"] }
 mysql = "24"
 my-app-domain = { path = "../my-app-domain" }
+opensearch = "2.2.0"
+anyhow = "1.0.86"
